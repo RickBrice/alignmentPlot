@@ -1,7 +1,7 @@
 # Alignment Profile Plot
 
 
-![Usage Example (mp4)](img/alignment_plot_usage.mp4)
+![Usage Example (mp4)](img/alignment_plot_usage.gif)
 
 This is an experimental addon intended to explore a method of displaying vertical profile and cant deviating elevations for alignments in Bonsai.
 
