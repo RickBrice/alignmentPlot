@@ -3,7 +3,7 @@ schema_version = "1.0.0"
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
 id = "alignment_plot"
-version = "0.0.1"
+version = "0.0.2"
 name = "Alignment Plot"
 tagline = "Plots alignment profile and cant"
 maintainer = "Rick Brice"

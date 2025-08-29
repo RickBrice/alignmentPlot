@@ -150,7 +150,8 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             
             fig,ax = plt.subplots()
             ax.plot(d,z)
-            ax.set_title("Profile")
+            ax.set_title("Profile",fontsize=12)
+            fig.suptitle(f"Alignment: {ifc_entity.Name}",fontsize=16)
             
             
             ax.xaxis.set_major_formatter(FuncFormatter(station_formatter))
@@ -180,7 +181,8 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             
             fig,ax = plt.subplots()
             ax.plot(d,z)
-            ax.set_title("Cant")
+            ax.set_title("Cant",fontsize=12)
+            fig.suptitle(f"Alignment: {ifc_entity.Name}",fontsize=16)
             
             
             ax.xaxis.set_major_formatter(FuncFormatter(station_formatter))
