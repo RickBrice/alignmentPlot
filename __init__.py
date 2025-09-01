@@ -129,7 +129,7 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
         
         file = tool.Ifc.get()
         curve = ifcopenshell.api.alignment.get_curve(ifc_entity)
-        start_station = ifcopenshell.api.alignment.get_alignment_station(file,ifc_entity)
+        start_station = ifcopenshell.api.alignment.get_alignment_start_station(file,ifc_entity)
 
         def station_formatter(x,pos):
             return ifcopenshell.util.alignment.station_as_string(file,x+start_station)
