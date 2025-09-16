@@ -122,14 +122,14 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             self.report({'ERROR'}, "No IFC class found for selected object.")
             return {'CANCELLED'}
 
-        ifc_entity = tool.Ifc.get().by_id(int(bpy.context.active_object.BIMObjectProperties.ifc_definition_id))
-        if not ifc_entity.is_a("IfcAlignment"):
+        alignment = tool.Ifc.get().by_id(int(bpy.context.active_object.BIMObjectProperties.ifc_definition_id))
+        if not alignment.is_a("IfcAlignment"):
             self.report({'ERROR'},"Selected object must be an IfcAlignment")
             return {'CANCELLED'}
         
         file = tool.Ifc.get()
-        curve = ifcopenshell.api.alignment.get_curve(ifc_entity)
-        start_station = ifcopenshell.api.alignment.get_alignment_start_station(file,ifc_entity)
+        curve = ifcopenshell.api.alignment.get_curve(alignment)
+        start_station = ifcopenshell.api.alignment.get_alignment_start_station(file,alignment)
 
         def station_formatter(x,pos):
             return ifcopenshell.util.alignment.station_as_string(file,x+start_station)
@@ -138,8 +138,12 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             unit_scale = ifcopenshell.util.unit.calculate_unit_scale(file)
             settings = ifcopenshell.geom.settings()
             gradient_fn = ifcopenshell.ifcopenshell_wrapper.map_shape(settings,curve.wrapped_data)
-            vertical = gradient_fn.get_vertical()
-            evaluator = ifcopenshell.ifcopenshell_wrapper.function_item_evaluator(settings,vertical)
+            if isinstance(gradient_fn,ifcopenshell.ifcopenshell_wrapper.gradient_function):
+                vertical = gradient_fn.get_vertical()
+                evaluator = ifcopenshell.ifcopenshell_wrapper.function_item_evaluator(settings,vertical)
+            else:
+                evaluator = ifcopenshell.ifcopenshell_wrapper.function_item_evaluator(settings,gradient_fn)
+
             distances = evaluator.evaluation_points()
             d = []
             z = []
@@ -151,7 +155,7 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             fig,ax = plt.subplots()
             ax.plot(d,z)
             ax.set_title("Profile",fontsize=12)
-            fig.suptitle(f"Alignment: {ifc_entity.Name}",fontsize=16)
+            fig.suptitle(f"Alignment: {alignment.Name}",fontsize=16)
             
             
             ax.xaxis.set_major_formatter(FuncFormatter(station_formatter))
@@ -182,7 +186,7 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             fig,ax = plt.subplots()
             ax.plot(d,z)
             ax.set_title("Cant",fontsize=12)
-            fig.suptitle(f"Alignment: {ifc_entity.Name}",fontsize=16)
+            fig.suptitle(f"Alignment: {alignment.Name}",fontsize=16)
             
             
             ax.xaxis.set_major_formatter(FuncFormatter(station_formatter))
@@ -197,10 +201,14 @@ class IFC_OT_AlignmentGraph(bpy.types.Operator):
             load_image_in_blender("Cant",png_path)
 
 
+        if not curve:
+            self.report({'INFO'},f"Alignment {alignment.Name} does not have a representation")
+            return {'FINISHED'}
+        
         if curve.is_a("IfcSegmentedReferenceCurve"):
             plot_cant(file,curve)
             plot_profile(file,curve.BaseCurve)
-        elif curve.is_a("IfcGradientCurve"):
+        elif curve.is_a("IfcGradientCurve") or curve.is_a("IfcOffsetCurveByDistances"):
             plot_profile(file,curve)
 
 
